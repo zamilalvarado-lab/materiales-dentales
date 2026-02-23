@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f0f">
+<title>Mis Materiales · Odontología</title>
+<style>
+:root{
+  --bg:#0f0f0f;
+  --surface:#1a1a1a;
+  --surface2:#222;
+  --surface3:#2a2a2a;
+  --border:#2e2e2e;
+  --text:#f0f0f0;
+  --muted:#666;
+  --muted2:#444;
+  --green:#00d084;
+  --green-dim:#0a2e1e;
+  --green-border:#005535;
+  --red:#ff4757;
+  --red-dim:#2e0a0a;
+  --red-border:#550005;
+  --blue:#4d9eff;
+  --orange:#ff8c42;
+  --yellow:#ffd166;
+  --radius:14px;
+  --radius-sm:10px;
+  --radius-xs:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+  background:var(--bg);color:var(--text);
+  padding-bottom:80px;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,textarea{
+  font-family:inherit;-webkit-appearance:none;appearance:none;
+}
+button{cursor:pointer;border:none;background:none;color:inherit}
+
+/* ── HEADER ───────────────────────────────── */
+.hdr{
+  background:linear-gradient(160deg,#1a1a2e 0%,#0f0f0f 60%);
+  padding:20px 16px 14px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.hdr-title{font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.1}
+.hdr-title span{color:var(--green)}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.hdr-add{
+  background:var(--green);color:#000;
+  border-radius:999px;padding:7px 14px;
+  font-size:12px;font-weight:800;white-space:nowrap;
+  box-shadow:0 0 20px rgba(0,208,132,0.3);
+}
+
+/* Progress */
+.prog-row{display:flex;align-items:center;gap:10px}
+.prog-bar-wrap{flex:1;background:var(--surface3);border-radius:999px;height:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),#00ffaa);border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.prog-pct{font-size:11px;font-weight:700;color:var(--green);min-width:32px;text-align:right}
+
+/* ── STATS ROW ────────────────────────────── */
+.stats-row{
+  display:flex;gap:6px;padding:10px 14px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.stats-row::-webkit-scrollbar{display:none}
+.stat-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:8px 12px;
+  text-align:center;flex-shrink:0;min-width:70px;
+}
+.stat-num{font-size:18px;font-weight:800;line-height:1}
+.stat-lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+.stat-card.g .stat-num{color:var(--green)}
+.stat-card.r .stat-num{color:var(--red)}
+.stat-card.b .stat-num{color:var(--blue)}
+.stat-card.o .stat-num{color:var(--orange)}
+
+/* ── TABS ─────────────────────────────────── */
+.tabs{
+  display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;background:var(--surface);
+  border-bottom:1px solid var(--border);padding:0 10px;gap:2px;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:12px 14px;font-size:12px;font-weight:700;
+  color:var(--muted);border-bottom:2px solid transparent;
+  white-space:nowrap;flex-shrink:0;margin-bottom:-1px;
+  transition:color .2s,border-color .2s;
+}
+.tab.active{color:var(--text);border-bottom-color:var(--green)}
+
+/* ── FILTERS ──────────────────────────────── */
+.filters{
+  display:flex;gap:6px;padding:10px 12px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.filters::-webkit-scrollbar{display:none}
+.fbtn{
+  padding:5px 13px;border-radius:999px;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--muted);font-size:11px;font-weight:700;
+  white-space:nowrap;flex-shrink:0;transition:all .15s;
+}
+.fbtn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* ── PANEL ────────────────────────────────── */
+.panel{display:none;padding:12px 12px;max-width:680px;margin:0 auto}
+.panel.active{display:block}
+.panel-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.panel-meta-title{font-size:17px;font-weight:800}
+.panel-meta-counts{font-size:11px;color:var(--muted)}
+
+/* ── SECTION HEADER ───────────────────────── */
+.sec-hdr{
+  display:flex;align-items:center;gap:8px;
+  margin:18px 0 8px;
+}
+.sec-hdr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sec-hdr.instr .sec-hdr-dot{background:var(--blue)}
+.sec-hdr.consum .sec-hdr-dot{background:var(--orange)}
+.sec-hdr-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.sec-hdr.instr .sec-hdr-label{color:var(--blue)}
+.sec-hdr.consum .sec-hdr-label{color:var(--orange)}
+.sec-hdr-line{flex:1;height:1px;background:var(--border)}
+.sec-hdr-count{font-size:10px;color:var(--muted);font-weight:600}
+
+/* ── ITEM ─────────────────────────────────── */
+.item{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 10px;
+  margin-bottom:6px;transition:border-color .2s,background .2s;
+  position:relative;overflow:hidden;
+}
+.item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+}
+.item.instr::before{background:var(--blue)}
+.item.consum::before{background:var(--orange)}
+.item.have{background:var(--green-dim);border-color:var(--green-border)}
+.item.have::before{background:var(--green)}
+.item.missing{background:var(--red-dim);border-color:var(--red-border)}
+.item.missing::before{background:var(--red)}
+
+/* Label + edit */
+.item-main{flex:1;min-width:0}
+.item-label{
+  font-size:13px;line-height:1.4;color:var(--text);
+  word-break:break-word;
+}
+.item.have .item-label{color:#52e09c}
+.item.missing .item-label{color:#ff6b6b;text-decoration:line-through;opacity:.7}
+
+.item-edit-input{
+  width:100%;background:var(--surface3);
+  border:1.5px solid var(--blue);border-radius:var(--radius-xs);
+  color:var(--text);font-size:13px;padding:5px 8px;
+  display:none;
+}
+.item-edit-input.show{display:block}
+.item-label.hide{display:none}
+
+/* Right side */
+.item-right{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.price-wrap{display:flex;align-items:center;gap:2px}
+.price-sym{font-size:10px;color:var(--muted)}
+.price-in{
+  width:54px;border:1px solid var(--border);
+  border-radius:var(--radius-xs);padding:4px 5px;
+  font-size:11px;background:var(--surface2);
+  color:var(--text);text-align:right;
+}
+.price-in:focus{outline:none;border-color:var(--green)}
+
+/* Action buttons */
+.abtn{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;transition:transform .1s;
+}
+.abtn:active{transform:scale(.88)}
+.abtn.have-btn{background:rgba(0,208,132,.12);border:1.5px solid rgba(0,208,132,.25)}
+.abtn.miss-btn{background:rgba(255,71,87,.12);border:1.5px solid rgba(255,71,87,.25)}
+.abtn.have-btn.on{background:var(--green);border-color:var(--green)}
+.abtn.miss-btn.on{background:var(--red);border-color:var(--red)}
+.abtn.edit-btn{background:var(--surface3);border:1.5px solid var(--border);font-size:12px}
+.abtn.edit-btn.editing{background:rgba(77,158,255,.15);border-color:var(--blue)}
+
+/* ── ADD ITEM MODAL ───────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  z-index:200;display:none;align-items:flex-end;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--surface);border-radius:24px 24px 0 0;
+  padding:20px 16px 30px;width:100%;
+  border-top:1px solid var(--border);
+  animation:slideUp .25s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:14px}
+.modal-label{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.modal-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px;
+  color:var(--text);font-size:14px;margin-bottom:12px;
+}
+.modal-input:focus{outline:none;border-color:var(--green)}
+.modal-row{display:flex;gap:8px;margin-bottom:16px}
+.type-pick{
+  flex:1;padding:12px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface2);
+  font-size:12px;font-weight:700;color:var(--muted);text-align:center;
+  transition:all .15s;
+}
+.type-pick.sel-instr{border-color:var(--blue);background:rgba(77,158,255,.1);color:var(--blue)}
+.type-pick.sel-consum{border-color:var(--orange);background:rgba(255,140,66,.1);color:var(--orange)}
+.modal-btns{display:flex;gap:8px}
+.modal-btn{
+  flex:1;padding:13px;border-radius:var(--radius-sm);
+  font-size:14px;font-weight:800;text-align:center;
+}
+.modal-btn.cancel{background:var(--surface3);color:var(--muted)}
+.modal-btn.confirm{background:var(--green);color:#000;box-shadow:0 0 20px rgba(0,208,132,.25)}
+.tab-pick-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tab-pick{
+  padding:7px 12px;border-radius:999px;
+  border:1.5px solid var(--border);background:var(--surface2);
+  font-size:11px;font-weight:700;color:var(--muted);
+}
+.tab-pick.active{border-color:var(--green);color:var(--green);background:rgba(0,208,132,.1)}
+
+/* ── BOTTOM BAR ───────────────────────────── */
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,15,15,.95);
+  border-top:1px solid var(--border);
+  padding:10px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+  z-index:100;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  flex-wrap:wrap;gap:6px;
+}
+.bb-lbl{font-size:10px;color:var(--muted);font-weight:600}
+.bb-nums{display:flex;gap:14px;align-items:center}
+.bb-col{text-align:right}
+.bb-col-lbl{font-size:9px;color:var(--muted)}
+.bb-instr{color:var(--blue);font-weight:800;font-size:14px}
+.bb-consum{color:var(--orange);font-weight:800;font-size:14px}
+.bb-grand{color:var(--yellow);font-weight:800;font-size:18px}
+
+/* ── EMPTY STATE ──────────────────────────── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:8px}
+.empty-text{font-size:13px}
+
+/* ── TOAST ────────────────────────────────── */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:999px;padding:8px 18px;
+  font-size:12px;font-weight:700;color:var(--text);
+  z-index:999;transition:transform .3s cubic-bezier(.4,0,.2,1);
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">🦷 Mis <span>Materiales</span></div>
+      <div class="hdr-sub">4to Año · Odontología</div>
+    </div>
+    <button class="hdr-add" onclick="openModal()">+ Agregar</button>
+  </div>
+  <div class="prog-row">
+    <div class="prog-bar-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="prog-pct" id="prog-pct">0%</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card g"><div class="stat-num" id="s-have">0</div><div class="stat-lbl">Tengo</div></div>
+  <div class="stat-card r"><div class="stat-num" id="s-miss">0</div><div class="stat-lbl">Faltan</div></div>
+  <div class="stat-card b"><div class="stat-num" id="s-im">0</div><div class="stat-lbl">🔧 ❌</div></div>
+  <div class="stat-card o"><div class="stat-num" id="s-cm">0</div><div class="stat-lbl">🔄 ❌</div></div>
+  <div class="stat-card" style="border-color:#333"><div class="stat-num" id="s-all" style="color:#888">0</div><div class="stat-lbl">Total</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('protesis',this)">🦷 Prótesis I&II</button>
+  <button class="tab" onclick="switchTab('endo',this)">🔬 Endodoncia</button>
+  <button class="tab" onclick="switchTab('operatoria',this)">⚙️ Operatoria</button>
+  <button class="tab" onclick="switchTab('cirugia',this)">🔪 Cirugía</button>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="fbtn active" onclick="setFilter('all',this)">Todos</button>
+  <button class="fbtn" onclick="setFilter('have',this)">✅ Tengo</button>
+  <button class="fbtn" onclick="setFilter('missing',this)">❌ Faltan</button>
+  <button class="fbtn" onclick="setFilter('none',this)">⬜ Sin marcar</button>
+  <button class="fbtn" onclick="setFilter('instr',this)">🔧 Instrumental</button>
+  <button class="fbtn" onclick="setFilter('consum',this)">🔄 Insumos</button>
+</div>
+
+<!-- PANELS -->
+<div id="panel-protesis" class="panel active"></div>
+<div id="panel-endo" class="panel"></div>
+<div id="panel-operatoria" class="panel"></div>
+<div id="panel-cirugia" class="panel"></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bb-lbl">💸 Total a gastar (faltantes)</div>
+  <div class="bb-nums">
+    <div class="bb-col"><div class="bb-col-lbl">🔧 Instrumental</div><div class="bb-instr" id="tb-i">$0.00</div></div>
+    <div class="bb-col"><div class="bb-col-lbl">🔄 Insumos</div><div class="bb-consum" id="tb-c">$0.00</div></div>
+    <div class="bb-col"><div class="bb-col-lbl">TOTAL</div><div class="bb-grand" id="tb-t">$0.00</div></div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">➕ Agregar material</div>
+    <div class="modal-label">Materia</div>
+    <div class="tab-pick-row" id="modal-tabs">
+      <button class="tab-pick active" onclick="selectModalTab('protesis',this)">🦷 Prótesis</button>
+      <button class="tab-pick" onclick="selectModalTab('endo',this)">🔬 Endodoncia</button>
+      <button class="tab-pick" onclick="selectModalTab('operatoria',this)">⚙️ Operatoria</button>
+      <button class="tab-pick" onclick="selectModalTab('cirugia',this)">🔪 Cirugía</button>
+    </div>
+    <div class="modal-label">Tipo</div>
+    <div class="modal-row">
+      <button class="type-pick sel-instr" id="pick-instr" onclick="selectType('instr')">🔧 Instrumental</button>
+      <button class="type-pick" id="pick-consum" onclick="selectType('consum')">🔄 Insumo</button>
+    </div>
+    <div class="modal-label">Nombre del material</div>
+    <input class="modal-input" id="modal-name" type="text" placeholder="Ej: Pinza algodonera..." autocomplete="off">
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn confirm" onclick="confirmAdd()">Agregar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+var I='instr',C='consum';
+
+var DATA={
+ protesis:{title:'Prótesis I & II',sections:[
+  {type:I,label:'🔧 Instrumental · Compra única',items:['Tríada + sonda (4 juegos)','Cubetas stock metálicas para dentados','Cubetas stock metálicas para edéntulos','Cubetas parciales metálicas sup. e inf.','Taza de goma (2)','Vasos dappen (2)','Losetas de vidrio grandes (2)','Espátula metal para alginato y yeso','Espátula para mezclar cemento','Espátula para llevar cemento a boca','Espátula 7A','Espátula Holemback','Espátula Glickman','Cuchillo búfalo','Cuchillo para yeso','Regla milimetrada metálica endodoncia','Regla milimetrada flexible','Empacador de hilo retractor','Platina de Fox','Extractor para Coronas y Puentes','Pinza de ortopedia (curvo cónico)','Calibrador de metal','Calibrador de cera','Fresas Peeso y Gates Glidden','Tijera quirúrgica pequeña','Pinza mosquito','Articulador semiajustable (completo)','Articulador de bisagra','Micromotor pieza recta y contraángulo','Turbina','Dremel con adaptador','Separadores intrabucales','Arco de Young','Pinza porta grapas','Pinza perforadora goma dique','Pincel mediano plano','Postes de fibra de vidrio Nº1 y 2','Piedra diamante: Troncocónica (verde/azul/rojo)','Piedra diamante: Punta de flama (verde/rojo)','Piedra diamante: Pimpollo/balón (verde/rojo)','Piedra diamante: Cono invertido parte activa larga','Piedra diamante: Redonda Nº1,4,6 (verde/azul)','Piedra diamante: Torpedo (verde/azul)','Fresa carburo: Cilíndrica mediana','Fresa carburo: Redonda Nº1 y 2','Fresa carburo: Cono invertida mediana','Fresón recta: Cilíndrico metálico','Fresón recta: Quirúrgica 704 y 705','Fresón recta: Pimpollo metálico','Fresón recta: Pimpollo para acrílico rosado','Disco flexible diamantado','Mopa para pulir','Gomas para pulir acrílico','Yesquero / Mechero','Sonda periodontal (3)']},
+  {type:C,label:'🔄 Insumos · Se reponen',items:['Alginato (agua y polvo)','Yeso Piedra Tipo III y IV','Ceras rosadas en láminas','Cera de utilidad en tiras','Cera pegajosa','Acrílico en polvo rosado','Acrílico en polvo marfil','Acrílico en polvo azul','Monómero','Alcohol para quemar','Vaselina y Glicerina','Aislante para modelos','Papel articular','Hilo retractor 000 o 0','Silano','Cemento resinoso dual','Resina compuesta fluida y condensable','Pasta dental e hilo dental','Lápiz bicolor y grafito','Guía de color acrílico Coral','Guía de color cerámica VITA','Polisulfuro o Mercaptano (regular y liviano)','Silicona por adición (pesada, liviana y regular)','Adhesivo para mercaptano y silicona','Modelina baja fusión en barra','Ionómero de vidrio cementante','Cemento provisional coronas (zinc y Eugenol)','Agua oxigenada','Clorhexidina en solución al 2%','Anestesia y agujas','Enjuague bucal','Papel Envoplast','Alcohol isopropílico al 70%','Minas de grafito para compas gruesas','Pegamento universal UHU','Jabón líquido antiséptico','Vasos plásticos desechables','Campos desechables','Baberos desechables','Guantes de latex','Microaplicadores','Topes de goma endodoncia']}
+ ]},
+ endo:{title:'Integral Endodoncia',sections:[
+  {type:I,label:'🔧 Instrumental · Compra única',items:['Tríada + Sonda + Espejo Rodio + Explorador DG16','Cucharita de dentina','Porta Carpule','Separador de Minnesota','Pinza Algodonera','Goma Dique 6x6 + Perforador + Porta Grapa','Arco de Young (Souver)','Kit de Grapas (212, W7, W3, B4, 12a, 13a, 9, 2)','Fresa EndoZ','Condensadores laterales 25mm','Espaciadores','Condensador Mortonson / transportador de calor','Calibrador de Gutapercha','Mechero','Losetas de vidrio pequeñas','Vasos Dappen','Tijera de Endodoncia','Regla milimetrada metálica','Topes de goma para instrumentos de conductos','Turbina','Micromotor','Scaler','Espátula para cemento','Espátulas de resina','Espátula tipo condensador','Fresas redondas de diamante Nº2,4,6','Fresas redondas de carburo Nº4,6','Fresas cilíndricas de carburo Nº557-558','Endoray (posicionador radiográfico)','Eyectores Endodónticos','Lámpara de Fotocurado']},
+  {type:C,label:'🔄 Insumos · Se reponen',items:['Anestesia Tópica','Anestesia Local (Lidocaína/Articaína)','Limas K Nº06 y 08 de 25mm','Limas K Nº10 de 25mm','Limas 1ra serie 15-40 de 25mm','Limas 2da serie 45-80 de 25mm','Limas K Nº08 y 10 de 21mm','Limas 1ra serie 15-40 de 21mm','Limas 2da serie 45-80 de 21mm','Limas 1ra serie 31mm','Limas 2da serie 31mm','Limas preserie','Conos de Gutapercha 1ra Serie','Conos de Gutapercha 2da Serie','Conos de papel del 15 al 40 y 45 al 80','Cemento Provisional I pro LC','Cemento obturador MTA Fillapex','Hipoclorito de sodio 3% o 5.25%','EDTA 17%','Clorhexidina','Solución Fisiológica','Hidróxido de Calcio','Ionómero de vidrio','Glicerina','Alcohol absoluto','Agua destilada','Detector de caries','Gasas','Algodón trenzado','Jeringas 5cc + Endoeze','Jeringas carpule (agujas 30G y 27G)','Agujas de irrigación para endodoncia','Placas radiográficas periapicales','Barrera gingival','Hilo dental','Teflón','Endoclean','Endoblock']}
+ ]},
+ operatoria:{title:'Integral Operatoria',sections:[
+  {type:I,label:'🔧 Instrumental · Compra única',items:['Tríada + Sonda + Cucharita de Dentina','Turbina','Micromotor','Lámpara de Fotocurado','Espátula para llevar cemento y mezclar','Kit de espátulas de resina','Kit de pinceles para resina','Modelador de resina','Kit fresas conformación de cavidades','Kit fresas acabado y pulido','Kit fresas multihojas','Discos de pulido (3M, Super Snap, etc.)','Gomas de pulido (kit)','Espirales para pulido','Perforador de goma dique','Porta grapa + Goma dique + Arco de Young','Kit de grapas','Jeringa M. y Separador','Tijera recta','Vasos dappen','Cepillo para pulir (pelos de cabra)','Separadores intrabucales','Scaler']},
+  {type:C,label:'🔄 Insumos · Se reponen',items:['Kit Resinas Esmalte A1/A2/A3/A3.5 (Brilliant, Everglow, 3M, IPS Empress...)','Resina Fluida A1/A2/A3/A3.5','Adhesivo Universal Coltene','Ionómero de Vidrio Tipo II (Fuji o SDI Riva)','Teracal Bisco','Cemento provisional resinoso','Bandas matrices preformadas','Cuñas plásticas','Isotape o Teflón','Ácido fosfórico 37%','Clorhexidina en gel','Clorhexidina en jeringa','Protector D-Pulpar / Liner base cavitaria','Pasta diamantada de pulido','Hilo dental','Barrera gingival','Papel articular','Glicerina','Wedjets','Matriz preformada, Tofflemire y completa','Bandas celuloide','Lijas de resina varios granos','Algodón trenzado','Anestesia Tópica','Anestesia Lidocaína','Eyectores','Revelador de caries','Sellante','Pasta profiláctica','Piedra pómez','Cepillos profilácticos','Hilo retractor']}
+ ]},
+ cirugia:{title:'Integral Cirugía',sections:[
+  {type:I,label:'🔧 Instrumental · Compra única',items:['Tríada + Sonda','Separador de Minnesota','Jeringa metálica (carpule)','Elevadores rectos (Delgado, Mediano, Grueso)','Elevador tipo Bayoneta','Baja lengua','Periostotomo','Curetas de Lucas','Tijera de Tejido Blando','Tijeras de Mayo Curvas y Rectas','Portaagujas','Porta Sutura','Mango de bisturí Nº3','Pinzas Hemostáticas','Pinza de disección de Adson con dientes','Caja metálica esterilizadora','Fresas para pieza de Mano Recta','Fresa Quirúrgica','Forceps 150, 65, 69, 18L/18R','Forceps 151, 16, 17','Forcep 10H (Solo para 8vo)']},
+  {type:C,label:'🔄 Insumos · Se reponen',items:['Anestesia Tópica','Anestesia Lidocaína / Articaína / Mepivacaína','Kit de Hilo de Sutura','Hojas de bisturí Nº3 (desechables)','Tacos de goma','Guantes de Latex','Batolines','Campos cerrados y Abiertos','Tapabocas KN-95','Gasas estériles','Solución fisiológica','Inyectadoras 20cc','Caretas','Alcohol isopropílico']}
+ ]}
+};
+
+// ── STATE ──────────────────────────────────────
+var ST={};
+(function(){
+  for(var t in DATA){
+    DATA[t].sections.forEach(function(sec){
+      sec.items.forEach(function(_,i){
+        ST[t+'__'+sec.type+'__'+i]={status:'none',price:'',label:sec.items[i]};
+      });
+    });
+  }
+})();
+
+var activeTab='protesis';
+var activeFilter='all';
+var editingKey=null;
+
+// modal state
+var modalTab='protesis';
+var modalType='instr';
+
+function k(tab,type,i){return tab+'__'+type+'__'+i;}
+
+// ── BUILD ──────────────────────────────────────
+function buildAll(){for(var t in DATA)buildPanel(t);updateStats();}
+
+function buildPanel(tab){
+  var d=DATA[tab];
+  var el=document.getElementById('panel-'+tab);
+  var html='<div class="panel-meta"><div class="panel-meta-title">'+d.title+'</div><div class="panel-meta-counts" id="pm-'+tab+'"></div></div>';
+  d.sections.forEach(function(sec){
+    var cnt=sec.items.length;
+    html+='<div class="sec-hdr '+sec.type+'">'
+      +'<div class="sec-hdr-dot"></div>'
+      +'<div class="sec-hdr-label">'+sec.label+'</div>'
+      +'<div class="sec-hdr-line"></div>'
+      +'<div class="sec-hdr-count">'+cnt+'</div>'
+      +'</div>';
+    html+='<div id="sec-'+tab+'-'+sec.type+'">';
+    sec.items.forEach(function(label,i){html+=renderItem(tab,sec.type,i);});
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function renderItem(tab,type,i){
+  var kk=k(tab,type,i);
+  var s=ST[kk];
+  var label=s.label||DATA[tab].sections.find(function(sc){return sc.type===type;}).items[i];
+  var cls=type+' '+(s.status==='have'?'have':s.status==='missing'?'missing':'');
+  var isEditing=(editingKey===kk);
+  return '<div class="item '+cls+'" id="itm-'+tab+'-'+type+'-'+i+'">'
+    +'<div class="item-main">'
+    +'<div class="item-label'+(isEditing?' hide':'')+'" id="lbl-'+kk+'">'+escHtml(label)+'</div>'
+    +'<input class="item-edit-input'+(isEditing?' show':'')+'" id="inp-'+kk+'" type="text" value="'+escAttr(label)+'" '
+    +'onblur="saveEdit(\''+kk+'\')" onkeydown="editKeydown(event,\''+kk+'\')" autocomplete="off">'
+    +'</div>'
+    +'<div class="item-right">'
+    +'<div class="price-wrap"><span class="price-sym">$</span>'
+    +'<input class="price-in" type="number" inputmode="decimal" min="0" placeholder="0" value="'+escAttr(s.price||'')+'" '
+    +'onchange="setPrice(\''+kk+'\',this.value)" oninput="setPrice(\''+kk+'\',this.value)">'
+    +'</div>'
+    +'<button class="abtn have-btn'+(s.status==='have'?' on':'')+'" onclick="setSt(\''+kk+'\',\'have\')">✅</button>'
+    +'<button class="abtn miss-btn'+(s.status==='missing'?' on':'')+'" onclick="setSt(\''+kk+'\',\'missing\')">❌</button>'
+    +'<button class="abtn edit-btn'+(isEditing?' editing':'')+'" onclick="toggleEdit(\''+kk+'\',\''+tab+'\',\''+type+'\','+i+')">✏️</button>'
+    +'</div></div>';
+}
+
+// ── ACTIONS ────────────────────────────────────
+function setSt(kk,status){
+  ST[kk].status=ST[kk].status===status?'none':status;
+  var parts=kk.split('__');
+  refreshItem(parts[0],parts[1],parseInt(parts[2]));
+  updateStats();applyFilter();
+}
+
+function setPrice(kk,val){
+  ST[kk].price=val;
+  updateStats();
+}
+
+function toggleEdit(kk,tab,type,i){
+  if(editingKey&&editingKey!==kk)saveEdit(editingKey);
+  if(editingKey===kk){saveEdit(kk);return;}
+  editingKey=kk;
+  refreshItem(tab,type,i);
+  setTimeout(function(){
+    var inp=document.getElementById('inp-'+kk);
+    if(inp){inp.focus();inp.select();}
+  },50);
+}
+
+function saveEdit(kk){
+  if(editingKey!==kk)return;
+  var inp=document.getElementById('inp-'+kk);
+  if(inp){
+    var newVal=inp.value.trim();
+    if(newVal){
+      ST[kk].label=newVal;
+      // also update DATA array
+      var parts=kk.split('__');
+      var t=parts[0],type=parts[1],i=parseInt(parts[2]);
+      DATA[t].sections.forEach(function(sec){if(sec.type===type)sec.items[i]=newVal;});
+    }
+  }
+  editingKey=null;
+  var parts=kk.split('__');
+  refreshItem(parts[0],parts[1],parseInt(parts[2]));
+  showToast('✏️ Nombre actualizado');
+}
+
+function editKeydown(e,kk){
+  if(e.key==='Enter')saveEdit(kk);
+  if(e.key==='Escape'){editingKey=null;var p=kk.split('__');refreshItem(p[0],p[1],parseInt(p[2]));}
+}
+
+function refreshItem(tab,type,i){
+  var el=document.getElementById('itm-'+tab+'-'+type+'-'+i);
+  if(!el)return;
+  el.outerHTML=renderItem(tab,type,i);
+}
+
+function updateStats(){
+  var have=0,miss=0,all=0,im=0,cm=0,it=0,ct=0;
+  for(var t in DATA){
+    var th=0,tm=0;
+    DATA[t].sections.forEach(function(sec){
+      sec.items.forEach(function(_,i){
+        var s=ST[k(t,sec.type,i)];
+        all++;
+        if(s&&s.status==='have'){have++;th++;}
+        if(s&&s.status==='missing'){
+          miss++;tm++;
+          var p=parseFloat(s.price)||0;
+          if(sec.type===I){im++;it+=p;}else{cm++;ct+=p;}
+        }
+      });
+    });
+    var pm=document.getElementById('pm-'+t);
+    if(pm)pm.textContent='✅ '+th+' · ❌ '+tm;
+  }
+  document.getElementById('s-have').textContent=have;
+  document.getElementById('s-miss').textContent=miss;
+  document.getElementById('s-im').textContent=im;
+  document.getElementById('s-cm').textContent=cm;
+  document.getElementById('s-all').textContent=all;
+  var pct=all>0?Math.round(have/all*100):0;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('tb-i').textContent='$'+it.toFixed(2);
+  document.getElementById('tb-c').textContent='$'+ct.toFixed(2);
+  document.getElementById('tb-t').textContent='$'+(it+ct).toFixed(2);
+}
+
+function switchTab(tabId,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+tabId).classList.add('active');
+  btn.classList.add('active');
+  activeTab=tabId;activeFilter='all';
+  document.querySelectorAll('.fbtn').forEach(function(b,idx){b.classList.toggle('active',idx===0);});
+  applyFilter();
+}
+
+function setFilter(filter,btn){
+  activeFilter=filter;
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter(){
+  DATA[activeTab].sections.forEach(function(sec){
+    sec.items.forEach(function(_,i){
+      var el=document.getElementById('itm-'+activeTab+'-'+sec.type+'-'+i);
+      if(!el)return;
+      var s=ST[k(activeTab,sec.type,i)];
+      var show=true;
+      if(activeFilter==='have')show=s&&s.status==='have';
+      else if(activeFilter==='missing')show=s&&s.status==='missing';
+      else if(activeFilter==='none')show=!s||s.status==='none';
+      else if(activeFilter===I)show=sec.type===I;
+      else if(activeFilter===C)show=sec.type===C;
+      el.style.display=show?'':'none';
+    });
+  });
+}
+
+// ── ADD ITEM ───────────────────────────────────
+function openModal(){
+  modalTab=activeTab;modalType='instr';
+  document.querySelectorAll('.tab-pick').forEach(function(b){b.classList.remove('active');});
+  document.querySelector('.tab-pick[onclick*="'+modalTab+'"]').classList.add('active');
+  document.getElementById('pick-instr').className='type-pick sel-instr';
+  document.getElementById('pick-consum').className='type-pick';
+  document.getElementById('modal-name').value='';
+  document.getElementById('modal').classList.add('show');
+  setTimeout(function(){document.getElementById('modal-name').focus();},300);
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+function selectModalTab(tab,btn){
+  modalTab=tab;
+  document.querySelectorAll('.tab-pick').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+function selectType(type){
+  modalType=type;
+  document.getElementById('pick-instr').className='type-pick'+(type==='instr'?' sel-instr':'');
+  document.getElementById('pick-consum').className='type-pick'+(type==='consum'?' sel-consum':'');
+}
+
+function confirmAdd(){
+  var name=document.getElementById('modal-name').value.trim();
+  if(!name){showToast('⚠️ Escribe un nombre');return;}
+  var sec=DATA[modalTab].sections.find(function(s){return s.type===modalType;});
+  if(!sec){showToast('⚠️ Error, intenta de nuevo');return;}
+  var i=sec.items.length;
+  sec.items.push(name);
+  ST[k(modalTab,modalType,i)]={status:'none',price:'',label:name};
+  // rebuild section
+  var secEl=document.getElementById('sec-'+modalTab+'-'+modalType);
+  if(secEl){
+    var html='';
+    sec.items.forEach(function(_,idx){html+=renderItem(modalTab,modalType,idx);});
+    secEl.innerHTML=html;
+    // update count badge
+    var hdr=secEl.previousElementSibling;
+    if(hdr){var cnt=hdr.querySelector('.sec-hdr-count');if(cnt)cnt.textContent=sec.items.length;}
+  }
+  updateStats();
+  closeModal();
+  showToast('✅ "'+name+'" agregado');
+}
+
+// ── UTILS ──────────────────────────────────────
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escAttr(s){return s.replace(/"/g,'&quot;');}
+
+var toastTimer=null;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+buildAll();
+</script>
+</body>
+</html>
