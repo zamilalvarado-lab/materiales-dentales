@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>Z46 · Dashboard</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--surface3:#22223a;
+  --border:#2a2a45;--text:#e8e8ff;--muted:#6666aa;--muted2:#3a3a5a;
+  --accent:#00d4ff;--accent2:#7b4fff;--accent3:#00ff9d;
+  --gold:#ffd700;--red:#ff4466;--orange:#ff8c42;
+  --glow:0 0 20px rgba(0,212,255,.3);--glow2:0 0 30px rgba(123,79,255,.4);
+  --r:14px;--rs:10px;--rx:7px;
+}
+.light{
+  --bg:#f0f4ff;--surface:#fff;--surface2:#e8eeff;--surface3:#dde5ff;
+  --border:#c5d0ff;--text:#1a1a3a;--muted:#7788bb;--muted2:#aabbdd;
+  --accent:#0088cc;--accent2:#5533cc;--accent3:#00aa66;
+  --gold:#cc8800;--red:#cc2244;--orange:#cc6622;
+  --glow:0 2px 20px rgba(0,136,204,.15);--glow2:0 2px 20px rgba(85,51,204,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;overscroll-behavior:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;padding-bottom:90px;transition:background .3s,color .3s}
+button,input,select,textarea{font-family:inherit;-webkit-appearance:none;appearance:none;border:none;background:none;color:inherit}
+button{cursor:pointer}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,.012) 2px,rgba(0,212,255,.012) 4px);pointer-events:none;z-index:1000}
+.light::before{display:none}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--surface),var(--surface2));border-bottom:1px solid var(--border);padding:16px 16px 12px;position:sticky;top:0;z-index:50}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-badge{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;letter-spacing:-1px;box-shadow:var(--glow2);flex-shrink:0}
+.logo-name{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--accent);text-shadow:0 0 20px rgba(0,212,255,.5)}
+.light .logo-name{text-shadow:none}
+.logo-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.theme-btn{width:36px;height:36px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);font-size:16px;display:flex;align-items:center;justify-content:center}
+.date-chip{background:var(--surface3);border:1px solid var(--border);border-radius:999px;padding:4px 10px;font-size:10px;color:var(--muted);font-weight:600}
+.xp-row{display:flex;align-items:center;gap:8px}
+.xp-label{font-size:10px;color:var(--accent);font-weight:800;letter-spacing:.1em;white-space:nowrap}
+.xp-bar-wrap{flex:1;background:var(--surface3);border-radius:999px;height:5px;overflow:hidden;border:1px solid var(--border)}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent),var(--accent3));border-radius:999px;transition:width .6s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(0,212,255,.5)}
+.light .xp-fill{box-shadow:none}
+.xp-pct{font-size:10px;color:var(--accent);font-weight:800;min-width:40px;text-align:right}
+
+/* DOLAR */
+.dolar-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;font-size:11px}
+.dolar-label{color:var(--muted);font-weight:600}
+.dolar-val{color:var(--gold);font-weight:800}
+.dolar-time{color:var(--muted);font-size:9px;margin-left:auto}
+.dolar-refresh{color:var(--accent);font-size:14px;cursor:pointer;padding:2px 6px}
+
+/* NAV */
+.nav{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--surface);border-bottom:1px solid var(--border);padding:0 8px}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{padding:11px 14px;font-size:11px;font-weight:800;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;margin-bottom:-1px;letter-spacing:.05em;transition:color .2s,border-color .2s}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-btn.locked{opacity:.4;cursor:not-allowed}
+
+/* PANELS */
+.panel{display:none;padding:12px;max-width:680px;margin:0 auto;animation:fadeIn .2s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* LOCKED */
+.locked-panel{text-align:center;padding:50px 20px}
+.locked-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.locked-title{font-size:16px;font-weight:800;color:var(--muted);margin-bottom:6px}
+.locked-desc{font-size:12px;color:var(--muted2);line-height:1.6;max-width:280px;margin:0 auto}
+.unlock-date{margin-top:16px;display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:6px 16px;font-size:11px;color:var(--accent);font-weight:700}
+
+/* SECTION */
+.sec{margin-bottom:10px}
+.sec-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--glow);transition:border-color .2s}
+.light .card{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+
+/* MISIONES */
+.mision-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px;transition:all .2s;cursor:pointer}
+.mision-item.done{opacity:.5;background:var(--surface)}
+.mision-item.done .mision-label{text-decoration:line-through}
+.mision-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s}
+.mision-item.done .mision-check{background:var(--accent3);border-color:var(--accent3);color:#000}
+.mision-label{flex:1;font-size:13px;line-height:1.3}
+.mision-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.mision-xp{font-size:10px;color:var(--accent);font-weight:800;white-space:nowrap}
+.mision-expand{font-size:11px;color:var(--muted);padding:4px 6px;border-radius:4px;background:var(--surface3)}
+.mision-del{font-size:11px;color:var(--muted);padding:4px}
+.add-mision-row{display:flex;gap:6px;margin-top:8px}
+.mision-input{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rx);padding:9px 12px;font-size:13px;color:var(--text)}
+.mision-input:focus{outline:none;border-color:var(--accent)}
+.mision-add-btn{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border-radius:var(--rx);padding:9px 14px;font-size:13px;font-weight:800;box-shadow:var(--glow)}
+.light .mision-add-btn{box-shadow:none}
+
+/* WORKOUT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:flex-end;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:24px 24px 0 0;padding:20px 16px 34px;width:100%;border-top:1px solid var(--border);animation:slideUp .25s cubic-bezier(.4,0,.2,1);max-height:85vh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:900;margin-bottom:4px;color:var(--accent)}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.modal-close{position:absolute;top:16px;right:16px;font-size:18px;color:var(--muted);padding:4px 8px}
+.modal{position:relative}
+
+/* EJERCICIO en modal */
+.workout-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px}
+.workout-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.workout-detail{font-size:11px;color:var(--muted);margin-bottom:4px}
+.workout-sets{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--accent)}
+.workout-check-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.set-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:.15s;background:var(--surface3)}
+.set-check.done{background:var(--accent3);border-color:var(--accent3);color:#000}
+
+/* HABILIDADES LAB */
+.skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.skill-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.skill-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,212,255,.03));pointer-events:none}
+.skill-card.locked-skill{opacity:.55}
+.skill-card:active{transform:scale(.97)}
+.skill-icon{font-size:28px;margin-bottom:6px;line-height:1}
+.skill-name{font-size:12px;font-weight:800;margin-bottom:4px;line-height:1.2}
+.skill-lock{font-size:10px;color:var(--muted)}
+.skill-level{display:flex;gap:3px;justify-content:center;margin-top:6px}
+.skill-star{font-size:10px}
+.skill-price{font-size:10px;color:var(--gold);font-weight:700;margin-top:4px}
+
+/* SKILL DETAIL MODAL */
+.skill-detail-content{padding:4px 0}
+.skill-detail-icon{font-size:48px;text-align:center;margin-bottom:8px}
+.skill-detail-name{font-size:20px;font-weight:900;text-align:center;margin-bottom:4px}
+.skill-detail-price{text-align:center;color:var(--gold);font-weight:800;font-size:14px;margin-bottom:16px}
+.skill-req{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px}
+.skill-req-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px}
+.skill-req-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.skill-req-item:last-child{border-bottom:none}
+.req-lock{font-size:14px}
+.skill-levels{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px}
+.skill-level-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.skill-level-item:last-child{border-bottom:none}
+.lvl-badge{width:32px;height:32px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.lvl-badge.gold{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.4);color:var(--gold)}
+.lvl-info{flex:1}
+.lvl-name{font-size:12px;font-weight:700}
+.lvl-desc{font-size:10px;color:var(--muted)}
+
+
+.fin-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.fin-tabs::-webkit-scrollbar{display:none}
+.fin-tab{padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap;transition:.15s;flex-shrink:0}
+.fin-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+.fin-sub{display:none}.fin-sub.active{display:block;animation:fadeIn .15s ease}
+/* FINANZAS */
+.fin-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.fin-card-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.fin-card-val{font-size:20px;font-weight:900}
+.fin-card.ing .fin-card-val{color:var(--accent3)}
+.fin-card.gas .fin-card-val{color:var(--red)}
+.fin-card.saldo .fin-card-val{color:var(--gold)}
+.fin-full{grid-column:1/-1}
+.tx-row{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--surface2);border-radius:var(--rx);margin-bottom:5px;border:1px solid var(--border)}
+.tx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tx-dot.ing{background:var(--accent3)}.tx-dot.gas{background:var(--red)}.tx-dot.deu{background:var(--orange)}
+.tx-desc{flex:1;font-size:12px}
+.tx-val{font-size:12px;font-weight:800}
+.tx-val.ing{color:var(--accent3)}.tx-val.gas{color:var(--red)}.tx-val.deu{color:var(--orange)}
+.tx-del{font-size:10px;color:var(--muted);padding:4px 6px;border-radius:4px;background:var(--surface3)}
+.add-form{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:10px}
+.form-row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.fin-input{flex:1;min-width:100px;background:var(--surface3);border:1.5px solid var(--border);border-radius:var(--rx);padding:8px 10px;font-size:13px;color:var(--text)}
+.fin-input:focus{outline:none;border-color:var(--accent)}
+.fin-select{background:var(--surface3);border:1.5px solid var(--border);border-radius:var(--rx);padding:8px 10px;font-size:12px;color:var(--text)}
+.type-row{display:flex;gap:6px;margin-bottom:8px}
+.type-opt{flex:1;padding:7px;border-radius:var(--rx);border:1.5px solid var(--border);font-size:11px;font-weight:700;text-align:center;color:var(--muted);transition:.15s}
+.type-opt.sel-ing{border-color:var(--accent3);color:var(--accent3);background:rgba(0,255,157,.08)}
+.type-opt.sel-gas{border-color:var(--red);color:var(--red);background:rgba(255,68,102,.08)}
+.type-opt.sel-deu{border-color:var(--orange);color:var(--orange);background:rgba(255,140,66,.08)}
+.add-btn{width:100%;padding:10px;border-radius:var(--rx);background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:13px;font-weight:800;box-shadow:var(--glow)}
+.light .add-btn{box-shadow:none}
+.meta-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px}
+.meta-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.meta-name{font-size:13px;font-weight:700}
+.meta-vals{font-size:11px;color:var(--muted)}
+.meta-bar-wrap{background:var(--surface3);border-radius:999px;height:6px;overflow:hidden;margin-bottom:4px}
+.meta-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .5s}
+.meta-pct{font-size:10px;color:var(--accent);font-weight:700}
+.meta-add-row{display:flex;gap:6px;margin-top:8px}
+.meta-add-input{flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:var(--rx);padding:6px 8px;font-size:12px;color:var(--text)}
+.meta-add-input:focus{outline:none;border-color:var(--accent)}
+.meta-add-btn{background:var(--accent3);color:#000;border-radius:var(--rx);padding:6px 12px;font-size:11px;font-weight:800}
+
+/* CONVERSION */
+.conv-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:10px}
+.conv-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.conv-input{flex:1;background:var(--surface3);border:1.5px solid var(--border);border-radius:var(--rx);padding:8px 10px;font-size:14px;font-weight:700;color:var(--text)}
+.conv-input:focus{outline:none;border-color:var(--accent)}
+.conv-label{font-size:11px;color:var(--muted);font-weight:700;min-width:32px}
+.conv-result{font-size:18px;font-weight:900;color:var(--gold);text-align:center;padding:8px;background:var(--surface3);border-radius:var(--rx)}
+
+/* POMODORO */
+.pomo-wrap{text-align:center;padding:10px 0}
+.pomo-ring{width:180px;height:180px;border-radius:50%;border:3px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;background:radial-gradient(circle,var(--surface2),var(--surface));box-shadow:var(--glow2),inset 0 0 30px rgba(0,0,0,.3)}
+.light .pomo-ring{box-shadow:0 4px 24px rgba(85,51,204,.15)}
+.pomo-ring svg{position:absolute;top:-3px;left:-3px;width:calc(100%+6px);height:calc(100%+6px);transform:rotate(-90deg)}
+.pomo-ring circle{fill:none;stroke:var(--accent2);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .5s linear}
+.pomo-time{font-size:42px;font-weight:900;letter-spacing:-2px;color:var(--text);line-height:1}
+.pomo-label{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.pomo-mode-row{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.pomo-mode-btn{padding:6px 14px;border-radius:999px;border:1.5px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);transition:.15s}
+.pomo-mode-btn.active{border-color:var(--accent2);color:var(--accent2);background:rgba(123,79,255,.1)}
+.pomo-btns{display:flex;gap:8px;justify-content:center}
+.pomo-btn{padding:12px 24px;border-radius:var(--rs);font-size:14px;font-weight:800;transition:all .15s}
+.pomo-btn.start{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;box-shadow:var(--glow2)}
+.pomo-btn.reset{background:var(--surface2);border:1.5px solid var(--border);color:var(--muted)}
+.light .pomo-btn.start{box-shadow:none}
+.pomo-sessions{font-size:12px;color:var(--muted);margin-top:12px}
+.pomo-sessions span{color:var(--gold);font-weight:800}
+.tip-card{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(123,79,255,.08));border:1px solid rgba(0,212,255,.2);border-radius:var(--rs);padding:10px 12px;margin-bottom:10px;font-size:12px;line-height:1.5;color:var(--text)}
+.light .tip-card{background:rgba(0,136,204,.06);border-color:rgba(0,136,204,.2)}
+
+/* EJERCICIO */
+.fase-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:999px;padding:5px 14px;font-size:11px;font-weight:800;color:#fff;margin-bottom:10px;box-shadow:var(--glow)}
+.light .fase-badge{box-shadow:none}
+.ejercicio-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.ej-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:.2s}
+.ejercicio-item.done .ej-check{background:var(--accent3);border-color:var(--accent3);color:#000}
+.ejercicio-item.done .ej-label{text-decoration:line-through;opacity:.5}
+.ej-label{flex:1;font-size:12px;line-height:1.4}
+.ej-detail{font-size:10px;color:var(--muted)}
+.ej-sets{font-size:10px;color:var(--accent);font-weight:700;white-space:nowrap}
+
+/* LECTURA */
+.book-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;margin-bottom:10px}
+.book-title{font-size:14px;font-weight:800;margin-bottom:2px}
+.book-author{font-size:11px;color:var(--muted);margin-bottom:10px}
+.book-prog{display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px}
+.book-prog-label{color:var(--muted)}
+.book-prog-val{color:var(--accent);font-weight:800}
+.book-bar-wrap{background:var(--surface3);border-radius:999px;height:8px;overflow:hidden;margin-bottom:8px}
+.book-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .5s}
+.book-update-row{display:flex;gap:6px}
+.book-update-input{flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:var(--rx);padding:6px 8px;font-size:12px;color:var(--text)}
+.book-update-input:focus{outline:none;border-color:var(--accent)}
+.book-update-btn{background:var(--accent2);color:#fff;border-radius:var(--rx);padding:6px 12px;font-size:11px;font-weight:800}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,15,.95);border-top:1px solid var(--border);padding:8px 0 10px;display:flex;justify-content:space-around;z-index:100;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.light .bottom-bar{background:rgba(240,244,255,.95)}
+.bb-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px;cursor:pointer}
+.bb-icon{font-size:20px;line-height:1}
+.bb-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.bb-item.active .bb-lbl{color:var(--accent)}
+.bb-item.active .bb-icon{filter:drop-shadow(0 0 4px rgba(0,212,255,.6))}
+.light .bb-item.active .bb-icon{filter:none}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--surface2);border:1px solid var(--accent);border-radius:999px;padding:8px 20px;font-size:12px;font-weight:700;color:var(--accent);z-index:999;transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;box-shadow:var(--glow)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body id="body">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo">
+      <div class="logo-badge">Z46</div>
+      <div>
+        <div class="logo-name">Z46</div>
+        <div class="logo-sub">Dashboard · 4to Año · Zamil</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="date-chip" id="date-chip"></div>
+      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+    </div>
+  </div>
+  <div class="xp-row">
+    <div class="xp-label">⚡ XP</div>
+    <div class="xp-bar-wrap"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-pct" id="xp-pct">0 XP · Nv.1</div>
+  </div>
+</div>
+
+<!-- DOLAR BAR -->
+<div class="dolar-bar">
+  <span class="dolar-label">💵 BCV:</span>
+  <span class="dolar-val" id="dolar-val">cargando...</span>
+  <span class="dolar-time" id="dolar-time"></span>
+  <button class="dolar-refresh" onclick="fetchDolar()">↻</button>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="switchPanel('misiones',this)">✅ Misiones</button>
+  <button class="nav-btn" onclick="switchPanel('finanzas',this)">💰 Finanzas</button>
+  <button class="nav-btn" onclick="switchPanel('pomodoro',this)">⏱️ Pomodoro</button>
+  <button class="nav-btn" onclick="switchPanel('ejercicio',this)">💪 Ejercicio</button>
+  <button class="nav-btn" onclick="switchPanel('laboratorio',this)">🦷 Lab</button>
+  <button class="nav-btn" onclick="switchPanel('lectura',this)">📚 Lectura</button>
+  <button class="nav-btn locked" onclick="showLocked('Horario','Se desbloquea cuando inicien tus clases del 4to año — organiza tu horario universitario y del laboratorio','📅','Inicio de clases 2026')">📅 Horario</button>
+  <button class="nav-btn locked" onclick="showLocked('Meditación','Completa 7 días de misión de meditación de 5 minutos para desbloquear el módulo completo con el sistema de Joe Dispenza','🧘','7 días meditando 5 min')">🧘 Meditar</button>
+</div>
+
+<!-- MISIONES -->
+<div id="panel-misiones" class="panel active">
+  <div class="sec">
+    <div class="sec-title">🗡️ Misiones del día</div>
+    <div id="misiones-list"></div>
+    <div class="add-mision-row">
+      <input class="mision-input" id="mision-input" type="text" placeholder="Nueva misión..." autocomplete="off">
+      <button class="mision-add-btn" onclick="addMision()">+</button>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:14px">
+    <div class="sec-title">📊 Progreso del día</div>
+    <div class="card" style="padding:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--muted)">Completadas</span>
+        <span style="font-size:12px;font-weight:800" id="mis-count">0/0</span>
+      </div>
+      <div class="xp-bar-wrap" style="height:8px"><div class="xp-fill" id="mis-bar" style="width:0%"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center" id="xp-min-note">Mínimo 50 XP para que cuente la racha</div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🔥 Stats</div>
+    <div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px">
+      <div style="text-align:center"><div style="font-size:26px;font-weight:900;color:var(--gold)" id="racha-num">0</div><div style="font-size:10px;color:var(--muted)">🔥 Racha</div></div>
+      <div style="text-align:center"><div style="font-size:26px;font-weight:900;color:var(--accent)" id="total-xp-disp">0</div><div style="font-size:10px;color:var(--muted)">⚡ XP hoy</div></div>
+      <div style="text-align:center"><div style="font-size:26px;font-weight:900;color:var(--accent3)" id="mis-done-total">0</div><div style="font-size:10px;color:var(--muted)">✅ Totales</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANZAS -->
+<div id="panel-finanzas" class="panel">
+  <div class="sec">
+    <div class="sec-title">💹 Resumen del mes</div>
+    <div class="fin-summary">
+      <div class="fin-card ing"><div class="fin-card-lbl">Ingresos</div><div class="fin-card-val" id="fin-ing">$0</div></div>
+      <div class="fin-card gas"><div class="fin-card-lbl">Gastos</div><div class="fin-card-val" id="fin-gas">$0</div></div>
+      <div class="fin-card saldo fin-full"><div class="fin-card-lbl">Saldo disponible</div><div class="fin-card-val" id="fin-saldo">$0</div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">🔄 Conversión rápida</div>
+    <div class="conv-box">
+      <div class="conv-row">
+        <span class="conv-label">USD $</span>
+        <input class="conv-input" id="conv-usd" type="number" inputmode="decimal" placeholder="0.00" oninput="convertUSD()">
+      </div>
+      <div class="conv-result" id="conv-bs-result">= Bs. —</div>
+      <div style="margin:8px 0;height:1px;background:var(--border)"></div>
+      <div class="conv-row">
+        <span class="conv-label">Bs.</span>
+        <input class="conv-input" id="conv-bs" type="number" inputmode="decimal" placeholder="0.00" oninput="convertBS()">
+      </div>
+      <div class="conv-result" id="conv-usd-result">= $ —</div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">➕ Registrar movimiento</div>
+    <div class="add-form">
+      <div class="type-row">
+        <button class="type-opt sel-ing" id="tx-ing" onclick="selTxType('ing')">💚 Ingreso</button>
+        <button class="type-opt" id="tx-gas" onclick="selTxType('gas')">🔴 Gasto</button>
+        <button class="type-opt" id="tx-deu" onclick="selTxType('deu')">🟠 Deuda</button>
+      </div>
+      <div class="form-row">
+        <input class="fin-input" id="tx-desc" type="text" placeholder="Descripción..." autocomplete="off">
+      </div>
+      <div class="form-row">
+        <input class="fin-input" id="tx-monto" type="number" inputmode="decimal" min="0" placeholder="Monto">
+        <select class="fin-select" id="tx-moneda">
+          <option value="usd">USD $</option>
+          <option value="bs">Bs.</option>
+        </select>
+      </div>
+      <button class="add-btn" onclick="addTx()">Registrar ✓</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">📋 Movimientos</div>
+    <div id="tx-list"><div class="empty-state">Sin movimientos aún</div></div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🎯 Metas de ahorro</div>
+    <div id="metas-list"></div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🔴 Deudas activas</div>
+    <div id="deudas-list"></div>
+  </div>
+</div>
+
+<!-- POMODORO -->
+<div id="panel-pomodoro" class="panel">
+  <div class="sec">
+    <div class="sec-title">⏱️ Pomodoro</div>
+    <div class="pomo-wrap">
+      <div class="pomo-mode-row">
+        <button class="pomo-mode-btn active" onclick="setPomoMode(25,5,'Foco',this)">🧠 25 min</button>
+        <button class="pomo-mode-btn" onclick="setPomoMode(50,10,'Deep Work',this)">⚡ 50 min</button>
+        <button class="pomo-mode-btn" onclick="setPomoMode(15,5,'Estudio',this)">📖 15 min</button>
+      </div>
+      <div class="pomo-ring">
+        <svg viewBox="0 0 186 186">
+          <circle cx="93" cy="93" r="90" stroke="rgba(123,79,255,0.15)" stroke-width="3" fill="none"/>
+          <circle id="pomo-circle" cx="93" cy="93" r="90" stroke-width="3" stroke-dasharray="565.49" stroke-dashoffset="0"/>
+        </svg>
+        <div class="pomo-time" id="pomo-time">25:00</div>
+        <div class="pomo-label" id="pomo-label">LISTO</div>
+      </div>
+      <div class="pomo-btns">
+        <button class="pomo-btn start" id="pomo-start" onclick="togglePomo()">▶ Iniciar</button>
+        <button class="pomo-btn reset" onclick="resetPomo()">↺ Reset</button>
+      </div>
+      <div class="pomo-sessions">Sesiones hoy: <span id="pomo-sess">0</span> 🍅</div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">💡 Técnica</div>
+    <div class="tip-card"><strong>25 min de foco total</strong> → 5 min descanso → repite 4 veces → descanso largo.<br>Si te distraes, empiezas de nuevo. Sin excepciones. Eso es la disciplina. 🔥</div>
+  </div>
+</div>
+
+<!-- EJERCICIO -->
+<div id="panel-ejercicio" class="panel">
+  <div class="sec">
+    <div class="sec-title">💪 Fase 1 · Calistenia</div>
+    <div class="fase-badge">⚡ Activo · En casa</div>
+    <div class="tip-card"><strong>Objetivo:</strong> Dejar de hacer 100 fáciles, hacer 10 difíciles.<br>💧 3L agua · Progresa cada semana · Constancia > Intensidad</div>
+    <div id="ejercicio-list"></div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🍽️ Nutrición</div>
+    <div class="card" style="padding:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:8px;text-align:center"><div style="font-size:9px;color:var(--muted)">Proteína</div><div style="font-size:12px;font-weight:700;color:var(--accent3)">🥚 Huevos · Pollo</div><div style="font-size:9px;color:var(--muted)">palma de tu mano</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:8px;text-align:center"><div style="font-size:9px;color:var(--muted)">Carbos</div><div style="font-size:12px;font-weight:700;color:var(--gold)">🍚 Arroz · Avena</div><div style="font-size:9px;color:var(--muted)">2 puños cerrados</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:8px;text-align:center"><div style="font-size:9px;color:var(--muted)">Grasas</div><div style="font-size:12px;font-weight:700;color:var(--orange)">🥜 Maní · Aguacate</div><div style="font-size:9px;color:var(--muted)">tu pulgar</div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rx);padding:8px;text-align:center"><div style="font-size:9px;color:var(--muted)">Pre-entreno</div><div style="font-size:12px;font-weight:700;color:var(--accent)">🍌 Banano</div><div style="font-size:9px;color:var(--muted)">energía rápida</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🔒 Fase 2 · Gimnasio</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;opacity:.5;text-align:center"><div style="font-size:24px;margin-bottom:6px">🔒</div><div style="font-size:12px;color:var(--muted)">Completa 30 días de Fase 1</div></div>
+  </div>
+</div>
+
+<!-- LABORATORIO -->
+<div id="panel-laboratorio" class="panel">
+  <div class="sec">
+    <div class="sec-title">🦷 Árbol de habilidades · Lab Dental</div>
+    <div class="tip-card">Toca cualquier habilidad para ver sus niveles y requisitos. Los protocolos detallados se desbloquean el <strong>15 de marzo</strong> cuando inicies en el laboratorio. 🔒</div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">⭐ Férulas</div>
+    <div class="skill-grid" id="skills-ferulas"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">👑 Coronas</div>
+    <div class="skill-grid" id="skills-coronas"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">💎 Incrustaciones</div>
+    <div class="skill-grid" id="skills-incrustaciones"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">🦴 Prótesis Removible (Acrílico)</div>
+    <div class="skill-grid" id="skills-acrilicos"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-title">🔧 Ortopedia</div>
+    <div class="skill-grid" id="skills-ortopedia"></div>
+  </div>
+</div>
+
+<!-- LECTURA -->
+<div id="panel-lectura" class="panel">
+  <div class="sec">
+    <div class="sec-title">📚 Libros en curso</div>
+    <div id="books-list"></div>
+  </div>
+  <div class="sec" style="margin-top:4px">
+    <div class="sec-title">🔒 Por leer este año</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:12px;opacity:.6">
+      <div style="font-size:12px;color:var(--muted);text-align:center">Al completar tus libros actuales se desbloquean los siguientes 📖</div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCKED -->
+<div id="panel-locked" class="panel">
+  <div class="locked-panel">
+    <div class="locked-icon" id="locked-icon">🔒</div>
+    <div class="locked-title" id="locked-title">Módulo bloqueado</div>
+    <div class="locked-desc" id="locked-desc">Completa los requisitos</div>
+    <div class="unlock-date" id="locked-condition">⚡ Condición</div>
+  </div>
+</div>
+
+<!-- WORKOUT MODAL -->
+<div class="modal-overlay" id="workout-modal" onclick="closeModal('workout-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('workout-modal')">✕</button>
+    <div class="modal-title" id="wk-title">Ejercicio</div>
+    <div class="modal-sub" id="wk-sub"></div>
+    <div id="wk-content"></div>
+  </div>
+</div>
+
+<!-- SKILL MODAL -->
+<div class="modal-overlay" id="skill-modal" onclick="closeModal('skill-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('skill-modal')">✕</button>
+    <div id="skill-modal-content"></div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bb-item active" id="bb-misiones" onclick="switchPanel('misiones',null);setBB('misiones')"><div class="bb-icon">✅</div><div class="bb-lbl">Misiones</div></div>
+  <div class="bb-item" id="bb-finanzas" onclick="switchPanel('finanzas',null);setBB('finanzas')"><div class="bb-icon">💰</div><div class="bb-lbl">Finanzas</div></div>
+  <div class="bb-item" id="bb-pomodoro" onclick="switchPanel('pomodoro',null);setBB('pomodoro')"><div class="bb-icon">⏱️</div><div class="bb-lbl">Pomodoro</div></div>
+  <div class="bb-item" id="bb-laboratorio" onclick="switchPanel('laboratorio',null);setBB('laboratorio')"><div class="bb-icon">🦷</div><div class="bb-lbl">Lab</div></div>
+</div>
+
+
+<div class="save-badge" id="save-badge">💾 Guardado</div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ══════════════════════════════════════
+var SK='z46_v3';
+function lsSave(data){
+  try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){console.warn('Save failed');}
+  var b=document.getElementById('save-badge');
+  if(b){b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(function(){b.classList.remove('show');},1400);}
+}
+function lsLoad(){
+  try{var r=localStorage.getItem(SK);return r?JSON.parse(r):null;}catch(e){return null;}
+}
+var _st2=null;
+function dSave(){clearTimeout(_st2);_st2=setTimeout(function(){lsSave(STATE);},600);}
+
+// ── HELPERS ──
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+var toastT=null;
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  if(toastT)clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},2400);
+}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+// ── THEME ──
+var isDark=true;
+function toggleTheme(){
+  isDark=!isDark;
+  document.getElementById('body').className=isDark?'':'light';
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';
+}
+
+// ── DATE ──
+(function(){
+  var d=new Date();
+  var dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('date-chip').textContent=dias[d.getDay()]+' '+d.getDate()+' '+meses[d.getMonth()];
+})();
+
+// ── DOLAR ──
+window.dolarRate=407.37;
+function fetchDolar(){
+  document.getElementById('dolar-val').textContent='cargando...';
+  fetch('https://pydolarve.org/api/v1/dollar?page=bcv')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var rate=d.monitors&&d.monitors.usd?d.monitors.usd.price:null;
+      if(rate){window.dolarRate=parseFloat(rate);document.getElementById('dolar-val').textContent='Bs. '+parseFloat(rate).toFixed(2);document.getElementById('dolar-time').textContent='BCV · actualizado';}
+      else{document.getElementById('dolar-val').textContent='Bs. 407.37';document.getElementById('dolar-time').textContent='manual';}
+    })
+    .catch(function(){document.getElementById('dolar-val').textContent='Bs. 407.37';document.getElementById('dolar-time').textContent='manual';});
+}
+fetchDolar();
+
+// Conversion
+function convertUSD(){
+  var v=parseFloat(document.getElementById('conv-usd').value)||0;
+  document.getElementById('conv-bs-result').textContent='= Bs. '+(v*window.dolarRate).toFixed(2);
+}
+function convertBS(){
+  var v=parseFloat(document.getElementById('conv-bs').value)||0;
+  document.getElementById('conv-usd-result').textContent='= $ '+(v/window.dolarRate).toFixed(2);
+}
+
+// ── STATE ──
+var STATE={
+  misiones:[
+    {id:1,label:'🧘 Meditar 5 minutos',sub:'Cierra los ojos, respira y enfócate en el presente',done:false,xp:20,type:'meditar'},
+    {id:2,label:'💪 Ejercicio del día',sub:'Toca para ver el workout',done:false,xp:30,type:'workout'},
+    {id:3,label:'📖 Leer 10 páginas del Okeson',sub:'Pág. 30 → meta pág. 40',done:false,xp:20,type:'normal'},
+    {id:4,label:'💧 Tomar 3L de agua',sub:'Hidratación = rendimiento',done:false,xp:10,type:'normal'},
+    {id:5,label:'🚭 No fumar hoy',sub:'Un día más. Tú puedes.',done:false,xp:25,type:'normal'},
+    {id:6,label:'🦷 Estudiar laboratorio',sub:'Revisar protocolos o materiales del día',done:false,xp:20,type:'normal'},
+  ],
+  txs:[],
+  metas:[
+    {id:1,name:'🦷 Ortodoncia + caries + borde incisal',goal:800,saved:0},
+    {id:2,name:'👕 Uniformes (x2)',goal:30,saved:0},
+    {id:3,name:'📱 Teléfono con buena cámara',goal:300,saved:0},
+    {id:4,name:'💻 PC para tesis y casos',goal:400,saved:0},
+    {id:5,name:'🏍️ Moto',goal:2000,saved:0},
+  ],
+  deudas:[
+    {id:1,desc:'Compañera (exodoncia)',monto:25,moneda:'usd'},
+    {id:2,desc:'Regalo hermana pendiente',monto:15,moneda:'usd'},
+  ],
+  books:[
+    {id:1,title:'Oclusión de Okeson',author:'Jeffrey P. Okeson',current:30,total:500,unit:'páginas'},
+    {id:2,title:'La Psicología del Dinero',author:'Morgan Housel',current:4,total:20,unit:'capítulos'},
+  ],
+  xpTotal:0,xpHoy:0,racha:0,misDoneTotal:0,pomoSessions:0,
+  ejerciciosDone:[],
+  txType:'ing',nextId:200,
+  meditacionDias:0,
+};
+
+var WORKOUT_DETAIL={
+  label:'💪 Workout · Fase 1 Calistenia',
+  sub:'Completa todas las series para ganar +30 XP',
+  ejercicios:[
+    {name:'Flexiones Arqueras',detail:'Una mano se estira mientras la otra empuja',sets:5,reps:'8-10'},
+    {name:'Sentadilla Búlgara',detail:'Un pie apoyado atrás en una silla',sets:4,reps:'12'},
+    {name:'Fondos en Silla',detail:'Tríceps — baja lento, sube rápido',sets:4,reps:'15'},
+    {name:'Elevación de Piernas',detail:'Colgado en barra o parque, piernas rectas',sets:4,reps:'10'},
+  ]
+};
+
+// ── MISIONES ──
+function buildMisiones(){
+  var list=document.getElementById('misiones-list');
+  list.innerHTML=STATE.misiones.map(function(m){
+    var hasDetail=m.type==='workout'||m.type==='meditar';
+    return '<div class="mision-item'+(m.done?' done':'')+'" id="mis-'+m.id+'">'
+      +'<div class="mision-check" onclick="toggleMision('+m.id+')">'+(m.done?'✓':'')+'</div>'
+      +'<div style="flex:1" onclick="'+(hasDetail?'openMisionDetail('+m.id+')':'toggleMision('+m.id+')')+'\">'
+      +'<div class="mision-label">'+escH(m.label)+'</div>'
+      +(m.sub?'<div class="mision-sub">'+escH(m.sub)+'</div>':'')
+      +'</div>'
+      +(hasDetail?'<div class="mision-expand" onclick="openMisionDetail('+m.id+')">ver ›</div>':'')
+      +'<div class="mision-xp">+'+m.xp+' XP</div>'
+      +'<button class="mision-del" onclick="delMision('+m.id+')">✕</button>'
+      +'</div>';
+  }).join('');
+  updateMisionStats();
+}
+
+function openMisionDetail(id){
+  var m=STATE.misiones.find(function(x){return x.id===id;});
+  if(!m)return;
+  if(m.type==='workout'){
+    document.getElementById('wk-title').textContent=WORKOUT_DETAIL.label;
+    document.getElementById('wk-sub').textContent=WORKOUT_DETAIL.sub;
+    var html=WORKOUT_DETAIL.ejercicios.map(function(e,ei){
+      var checks='';
+      for(var s=0;s<e.sets;s++){
+        checks+='<div class="set-check" id="wkset-'+ei+'-'+s+'" onclick="toggleSet('+ei+','+s+','+e.sets+')"></div>';
+      }
+      return '<div class="workout-item">'
+        +'<div class="workout-name">'+e.name+'</div>'
+        +'<div class="workout-detail">'+e.detail+'</div>'
+        +'<div class="workout-sets">'+e.sets+' series × '+e.reps+' reps</div>'
+        +'<div class="workout-check-row">'+checks+'</div>'
+        +'</div>';
+    }).join('');
+    document.getElementById('wk-content').innerHTML=html;
+    document.getElementById('workout-modal').classList.add('show');
+  } else if(m.type==='meditar'){
+    document.getElementById('wk-title').textContent='🧘 Meditación · 5 minutos';
+    document.getElementById('wk-sub').textContent='Siéntate cómodo, cierra los ojos y enfócate solo en tu respiración';
+    document.getElementById('wk-content').innerHTML=
+      '<div class="tip-card" style="margin-bottom:10px"><strong>Técnica básica:</strong><br>1. Inhala por la nariz 4 segundos<br>2. Retén 4 segundos<br>3. Exhala por la boca 8 segundos<br>4. Repite durante 5 minutos<br><br>Si tu mente divaga, vuelve a la respiración sin juzgarte. Eso es meditar.</div>'
+      +'<div style="text-align:center;padding:10px">'
+      +'<div style="font-size:14px;color:var(--muted);margin-bottom:12px">Al completar 7 días seguidos desbloqueas el módulo completo de meditación con Joe Dispenza 🧠</div>'
+      +'<div style="font-size:28px;font-weight:900;color:var(--accent)">'+STATE.meditacionDias+'/7 días</div>'
+      +'</div>';
+    document.getElementById('workout-modal').classList.add('show');
+  }
+}
+
+var wkSetsDone={};
+function toggleSet(ei,s,total){
+  var key=ei+'-'+s;
+  var el=document.getElementById('wkset-'+ei+'-'+s);
+  if(!el)return;
+  if(wkSetsDone[key]){delete wkSetsDone[key];el.classList.remove('done');}
+  else{wkSetsDone[key]=true;el.classList.add('done');}
+}
+
+function toggleMision(id){
+  var m=STATE.misiones.find(function(x){return x.id===id;});
+  if(!m)return;
+  m.done=!m.done;
+  if(m.done){
+    STATE.xpTotal+=m.xp;STATE.xpHoy+=m.xp;STATE.misDoneTotal++;
+    if(m.type==='meditar')STATE.meditacionDias++;
+    showToast('⚡ +'+m.xp+' XP · ¡Misión completada!');
+  } else {
+    STATE.xpTotal=Math.max(0,STATE.xpTotal-m.xp);STATE.xpHoy=Math.max(0,STATE.xpHoy-m.xp);STATE.misDoneTotal=Math.max(0,STATE.misDoneTotal-1);
+    if(m.type==='meditar')STATE.meditacionDias=Math.max(0,STATE.meditacionDias-1);
+  }
+  buildMisiones();updateXP();dSave();
+}
+
+function delMision(id){STATE.misiones=STATE.misiones.filter(function(x){return x.id!==id;});buildMisiones();dSave();}
+
+function addMision(){
+  var inp=document.getElementById('mision-input');
+  var val=inp.value.trim();if(!val)return;
+  STATE.misiones.push({id:++STATE.nextId,label:val,done:false,xp:15,type:'normal'});
+  inp.value='';buildMisiones();dSave();showToast('✅ Misión agregada');
+}
+document.getElementById('mision-input').addEventListener('keydown',function(e){if(e.key==='Enter')addMision();});
+
+function updateMisionStats(){
+  var done=STATE.misiones.filter(function(m){return m.done;}).length;
+  var total=STATE.misiones.length;
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('mis-count').textContent=done+'/'+total;
+  document.getElementById('mis-bar').style.width=pct+'%';
+  var minXp=STATE.racha<30?50:80;
+  document.getElementById('xp-min-note').textContent='XP hoy: '+STATE.xpHoy+' · Mínimo '+minXp+' XP para contar racha';
+  document.getElementById('racha-num').textContent=STATE.racha;
+  document.getElementById('total-xp-disp').textContent=STATE.xpHoy;
+  document.getElementById('mis-done-total').textContent=STATE.misDoneTotal;
+}
+
+function updateXP(){
+  var xp=STATE.xpTotal;var lvl=Math.floor(xp/500)+1;
+  var pct=Math.min(100,Math.round((xp%500)/500*100));
+  document.getElementById('xp-fill').style.width=pct+'%';
+  document.getElementById('xp-pct').textContent=xp+' XP · Nv.'+lvl;
+  updateMisionStats();
+}
+
+// ── FINANZAS ──
+var txTypeSelected='ing';
+function selTxType(t){
+  txTypeSelected=t;
+  ['ing','gas','deu'].forEach(function(x){
+    document.getElementById('tx-'+x).className='type-opt'+(t===x?' sel-'+x:'');
+  });
+}
+
+function toUSD(m,moneda){return moneda==='bs'?m/window.dolarRate:m;}
+
+function addTx(){
+  var desc=document.getElementById('tx-desc').value.trim();
+  var monto=parseFloat(document.getElementById('tx-monto').value)||0;
+  var moneda=document.getElementById('tx-moneda').value;
+  if(!desc||!monto){showToast('⚠️ Completa todos los campos');return;}
+  STATE.txs.unshift({id:++STATE.nextId,type:txTypeSelected,desc:desc,monto:monto,moneda:moneda,date:new Date().toLocaleDateString('es')});
+  if(txTypeSelected==='deu')STATE.deudas.push({id:STATE.nextId,desc:desc,monto:monto,moneda:moneda});
+  document.getElementById('tx-desc').value='';document.getElementById('tx-monto').value='';
+  buildFinanzas();dSave();showToast('✓ Movimiento guardado');
+}
+
+function delTx(id){STATE.txs=STATE.txs.filter(function(x){return x.id!==id;});buildFinanzas();dSave();}
+function delDeuda(id){STATE.deudas=STATE.deudas.filter(function(x){return x.id!==id;});buildFinanzas();dSave();showToast('🎉 ¡Deuda saldada!');}
+
+function buildFinanzas(){
+  var ing=0,gas=0;
+  STATE.txs.forEach(function(tx){var u=toUSD(tx.monto,tx.moneda);if(tx.type==='ing')ing+=u;else if(tx.type==='gas')gas+=u;});
+  var saldo=ing-gas;
+  document.getElementById('fin-ing').textContent='$'+ing.toFixed(2);
+  document.getElementById('fin-gas').textContent='$'+gas.toFixed(2);
+  var sEl=document.getElementById('fin-saldo');
+  sEl.textContent=(saldo>=0?'$':'-$')+Math.abs(saldo).toFixed(2);
+  sEl.style.color=saldo>=0?'var(--accent3)':'var(--red)';
+  var txEl=document.getElementById('tx-list');
+  if(!STATE.txs.length){txEl.innerHTML='<div class="empty-state">Sin movimientos aún</div>';}
+  else{txEl.innerHTML=STATE.txs.slice(0,10).map(function(tx){
+    var sym=tx.moneda==='usd'?'$':'Bs.';
+    return '<div class="tx-row"><div class="tx-dot '+tx.type+'"></div><div class="tx-desc">'+escH(tx.desc)+'<br><span style="font-size:9px;color:var(--muted)">'+tx.date+'</span></div><div class="tx-val '+tx.type+'">'+sym+tx.monto.toFixed(2)+'</div><button class="tx-del" onclick="delTx('+tx.id+')">✕</button></div>';
+  }).join('');}
+  buildMetas();buildDeudas();
+}
+
+function buildMetas(){
+  document.getElementById('metas-list').innerHTML=STATE.metas.map(function(m){
+    var pct=m.goal>0?Math.min(100,Math.round(m.saved/m.goal*100)):0;
+    return '<div class="meta-item"><div class="meta-top"><div class="meta-name">'+escH(m.name)+'</div><div class="meta-vals">$'+m.saved.toFixed(0)+' / $'+m.goal+'</div></div>'
+      +'<div class="meta-bar-wrap"><div class="meta-bar-fill" style="width:'+pct+'%"></div></div>'
+      +'<div class="meta-pct">'+pct+'%</div>'
+      +'<div class="meta-add-row"><input class="meta-add-input" id="meta-inp-'+m.id+'" type="number" inputmode="decimal" placeholder="Agregar ahorro..."><button class="meta-add-btn" onclick="addMetaSave('+m.id+')">+ Guardar</button></div></div>';
+  }).join('');
+}
+
+function addMetaSave(id){
+  var inp=document.getElementById('meta-inp-'+id);
+  var val=parseFloat(inp.value)||0;if(!val)return;
+  var m=STATE.metas.find(function(x){return x.id===id;});
+  if(m){m.saved+=val;inp.value='';buildMetas();dSave();showToast('💰 ¡Ahorro registrado!');}
+}
+
+function buildDeudas(){
+  var el=document.getElementById('deudas-list');
+  if(!STATE.deudas.length){el.innerHTML='<div class="empty-state">Sin deudas 🎉</div>';return;}
+  el.innerHTML=STATE.deudas.map(function(d){
+    var sym=d.moneda==='usd'?'$':'Bs.';
+    return '<div class="tx-row"><div class="tx-dot deu"></div><div class="tx-desc">'+escH(d.desc)+'</div><div class="tx-val deu">'+sym+parseFloat(d.monto).toFixed(2)+'</div><button class="tx-del" onclick="delDeuda('+d.id+')" style="color:var(--accent3)">✓ Pagué</button></div>';
+  }).join('');
+}
+
+// ── POMODORO ──
+var pomoInterval=null,pomoRunning=false,pomoWorkMin=25,pomoBreakMin=5;
+var pomoSecs=25*60,pomoTotal=25*60,pomoIsBreak=false,CIRC=565.49;
+function setPomoMode(work,brk,name,btn){
+  if(pomoRunning)return;pomoWorkMin=work;pomoBreakMin=brk;pomoSecs=work*60;pomoTotal=work*60;pomoIsBreak=false;
+  document.querySelectorAll('.pomo-mode-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');updatePomoDisplay();
+}
+function togglePomo(){
+  if(pomoRunning){clearInterval(pomoInterval);pomoRunning=false;document.getElementById('pomo-start').textContent='▶ Continuar';}
+  else{
+    pomoRunning=true;document.getElementById('pomo-start').textContent='⏸ Pausar';
+    pomoInterval=setInterval(function(){
+      pomoSecs--;updatePomoDisplay();
+      if(pomoSecs<=0){
+        clearInterval(pomoInterval);pomoRunning=false;
+        if(!pomoIsBreak){
+          STATE.pomoSessions++;document.getElementById('pomo-sess').textContent=STATE.pomoSessions;
+          STATE.xpTotal+=25;STATE.xpHoy+=25;updateXP();showToast('🍅 ¡Pomodoro completo! +25 XP');
+          pomoIsBreak=true;pomoSecs=pomoBreakMin*60;pomoTotal=pomoBreakMin*60;
+          document.getElementById('pomo-start').textContent='▶ Descanso';
+        } else {
+          pomoIsBreak=false;pomoSecs=pomoWorkMin*60;pomoTotal=pomoWorkMin*60;
+          document.getElementById('pomo-start').textContent='▶ Nueva sesión';showToast('✅ Descansaste — ¡a trabajar!');
+        }
+        updatePomoDisplay();
+      }
+    },1000);
+  }
+}
+function resetPomo(){clearInterval(pomoInterval);pomoRunning=false;pomoIsBreak=false;pomoSecs=pomoWorkMin*60;pomoTotal=pomoWorkMin*60;document.getElementById('pomo-start').textContent='▶ Iniciar';updatePomoDisplay();}
+function updatePomoDisplay(){
+  var m=Math.floor(pomoSecs/60),s=pomoSecs%60;
+  document.getElementById('pomo-time').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  document.getElementById('pomo-label').textContent=pomoIsBreak?'DESCANSO':'FOCO';
+  var off=CIRC-(CIRC*(1-pomoSecs/pomoTotal));
+  document.getElementById('pomo-circle').style.strokeDashoffset=off;
+  document.getElementById('pomo-circle').style.stroke=pomoIsBreak?'var(--accent3)':'var(--accent2)';
+}
+
+// ── EJERCICIO ──
+var EJERCICIOS=[
+  {id:'e1',label:'Flexiones Arqueras',detail:'Una mano se estira, la otra empuja',sets:'5x8-10 reps'},
+  {id:'e2',label:'Sentadilla Búlgara',detail:'Pie apoyado atrás en silla',sets:'4x12 reps'},
+  {id:'e3',label:'Fondos en Silla',detail:'Para tríceps potentes',sets:'4x15 reps'},
+  {id:'e4',label:'Elevación de Piernas',detail:'Colgado en barra o parque',sets:'4x10 reps'},
+];
+function buildEjercicio(){
+  document.getElementById('ejercicio-list').innerHTML=EJERCICIOS.map(function(e){
+    var done=STATE.ejerciciosDone.indexOf(e.id)!==-1;
+    return '<div class="ejercicio-item'+(done?' done':'')+'">'
+      +'<div class="ej-check" onclick="toggleEj(\''+e.id+'\')">'+(done?'✓':'')+'</div>'
+      +'<div style="flex:1"><div class="ej-label">'+e.label+'</div><div class="ej-detail">'+e.detail+'</div></div>'
+      +'<div class="ej-sets">'+e.sets+'</div>'
+      +'</div>';
+  }).join('');
+}
+function toggleEj(id){
+  var idx=STATE.ejerciciosDone.indexOf(id);
+  if(idx===-1){STATE.ejerciciosDone.push(id);STATE.xpTotal+=10;STATE.xpHoy+=10;updateXP();dSave();showToast('💪 +10 XP');}
+  else{STATE.ejerciciosDone.splice(idx,1);STATE.xpTotal=Math.max(0,STATE.xpTotal-10);STATE.xpHoy=Math.max(0,STATE.xpHoy-10);updateXP();}
+  buildEjercicio();
+}
+
+// ── HABILIDADES ──
+var SKILLS={
+  ferulas:[
+    {id:'f1',name:'Férula Silicone',icon:'🫧',price:'$30',
+     levels:['Nv.1 · Haz tu primera férula de silicone','Nv.2 · Completa 3 férulas sin defectos','Nv.3 · Dominas tiempo y material perfectamente'],
+     reqs:['Material: Silicone de laboratorio','Equipo: Prensa o mufla','Tiempo estimado: 45-60 min','Protocolo: Bloqueado hasta 15 marzo 🔒']},
+    {id:'f2',name:'Férula Acetato',icon:'🧊',price:'$30',
+     levels:['Nv.1 · Primera férula de acetato','Nv.2 · Ajuste de borde y pulido limpio','Nv.3 · Adaptación perfecta en modelo'],
+     reqs:['Material: Lámina de acetato 1.5mm','Equipo: Termoformadora','Tiempo estimado: 30-40 min','Protocolo: Bloqueado hasta 15 marzo 🔒']},
+    {id:'f3',name:'Férula Acrílica',icon:'🦷',price:'$60',
+     levels:['Nv.1 · Primera férula acrílica terminada','Nv.2 · Sin burbujas, pulido profesional','Nv.3 · Ajuste oclusal preciso'],
+     reqs:['Material: Acrílico termocurable, monómero','Equipo: Mufla, horno, prensa','Tiempo estimado: 2-3 horas','Protocolo: Bloqueado hasta 15 marzo 🔒']},
+  ],
+  coronas:[
+    {id:'c1',name:'Corona Provisional',icon:'⭕',price:'$15/pza',levels:['Nv.1 · Primera corona provisional','Nv.2 · Ajuste marginal correcto','Nv.3 · Estética y oclusión perfectas'],reqs:['Material: Acrílico provisional','Equipo: Micromotor, fresa','Protocolo: Bloqueado 🔒']},
+    {id:'c2',name:'Metal Acrílico',icon:'🔩',price:'$50/pza',levels:['Nv.1 · Primera corona metal-acrílico','Nv.2 · Colado sin defectos','Nv.3 · Acabado y pulido profesional'],reqs:['Material: Aleación metálica, acrílico','Equipo: Centrífuga, horno','Protocolo: Bloqueado 🔒']},
+    {id:'c3',name:'Metal Cerámica',icon:'✨',price:'$90/pza',levels:['Nv.1 · Primera estratificación','Nv.2 · Cocción sin grietas','Nv.3 · Estética natural perfecta'],reqs:['Material: Cerámica, aleación','Equipo: Horno de cerámica','Protocolo: Bloqueado 🔒']},
+    {id:'c4',name:'Ceramagge/Ceromero',icon:'🌟',price:'$60/pza',levels:['Nv.1 · Primer tallado en ceromero','Nv.2 · Anatomía correcta','Nv.3 · Oclusión y estética perfectas'],reqs:['Material: Ceromero/ceramage','Equipo: Instrumentos de tallado','Protocolo: Bloqueado 🔒']},
+  ],
+  incrustaciones:[
+    {id:'i1',name:'Inlay',icon:'◼',price:'$40',levels:['Nv.1 · Primer inlay terminado','Nv.2 · Ajuste marginal preciso','Nv.3 · Pulido espejo'],reqs:['Material: Cera, revestimiento','Protocolo: Bloqueado 🔒']},
+    {id:'i2',name:'Onlay',icon:'◻',price:'$50',levels:['Nv.1 · Primer onlay terminado','Nv.2 · Cobertura cuspídea correcta','Nv.3 · Ajuste y pulido profesional'],reqs:['Material: Cera, revestimiento','Protocolo: Bloqueado 🔒']},
+    {id:'i3',name:'Overlay',icon:'🔷',price:'$60',levels:['Nv.1 · Primer overlay terminado','Nv.2 · Cobertura total correcta','Nv.3 · Oclusión y estética perfectas'],reqs:['Material: Cera, revestimiento','Protocolo: Bloqueado 🔒']},
+  ],
+  acrilicos:[
+    {id:'a1',name:'PPR Acrílico 1pza',icon:'🦴',price:'$60',levels:['Nv.1 · Primer PPR acrílico','Nv.2 · Ganchos adaptados','Nv.3 · Retención y estabilidad óptimas'],reqs:['Material: Acrílico, ganchos','Protocolo: Bloqueado 🔒']},
+    {id:'a2',name:'PPR Acrílico 2-5pzas',icon:'🦴',price:'$70',levels:['Nv.1 · PPR múltiple terminada','Nv.2 · Plano oclusal correcto','Nv.3 · Articulación perfecta'],reqs:['Material: Acrílico, ganchos múltiples','Protocolo: Bloqueado 🔒']},
+    {id:'a3',name:'Prótesis Total',icon:'😁',price:'$90 c/rodete',levels:['Nv.1 · Primera prótesis total','Nv.2 · Relación maxilomandibular correcta','Nv.3 · Estética y fonética perfectas'],reqs:['Material: Acrílico, dientes artificiales','Protocolo: Bloqueado 🔒']},
+    {id:'a4',name:'PPR Valplast',icon:'🌸',price:'$80-120',levels:['Nv.1 · Primer Valplast terminado','Nv.2 · Adaptación gingival perfecta','Nv.3 · Estética sin metal visible'],reqs:['Material: Resina Valplast','Equipo: Inyectora Valplast','Protocolo: Bloqueado 🔒']},
+  ],
+  ortopedia:[
+    {id:'o1',name:'Retenedor Post-Ortodoncia',icon:'🔗',price:'$70',levels:['Nv.1 · Primer retenedor terminado','Nv.2 · Ajuste y retención correctos','Nv.3 · Doblado de alambres perfecto'],reqs:['Material: Alambre, acrílico','Protocolo: Bloqueado 🔒']},
+    {id:'o2',name:'Expansor (Par)',icon:'🔧',price:'$90',levels:['Nv.1 · Primer expansor terminado','Nv.2 · Activación correcta','Nv.3 · Fabricación autónoma'],reqs:['Material: Tornillo expansor, alambre, acrílico','Protocolo: Bloqueado 🔒']},
+    {id:'o3',name:'Aparato Bimler',icon:'⚙️',price:'$80',levels:['Nv.1 · Primer Bimler terminado','Nv.2 · Ajuste y función correctos','Nv.3 · Fabricación sin guía'],reqs:['Material: Alambres especiales, acrílico','Protocolo: Bloqueado 🔒']},
+  ],
+};
+
+function buildSkills(){
+  Object.keys(SKILLS).forEach(function(cat){
+    var el=document.getElementById('skills-'+cat);
+    if(!el)return;
+    el.innerHTML=SKILLS[cat].map(function(sk){
+      return '<div class="skill-card locked-skill" onclick="openSkill(\''+sk.id+'\')">'
+        +'<div class="skill-icon">'+sk.icon+'</div>'
+        +'<div class="skill-name">'+sk.name+'</div>'
+        +'<div class="skill-price">'+sk.price+'</div>'
+        +'<div class="skill-level">⭐⭐⭐</div>'
+        +'<div class="skill-lock">🔒 Toca para ver</div>'
+        +'</div>';
+    }).join('');
+  });
+}
+
+function openSkill(id){
+  var sk=null;
+  Object.values(SKILLS).forEach(function(arr){arr.forEach(function(s){if(s.id===id)sk=s;});});
+  if(!sk)return;
+  var html='<div class="skill-detail-content">'
+    +'<div class="skill-detail-icon">'+sk.icon+'</div>'
+    +'<div class="skill-detail-name">'+sk.name+'</div>'
+    +'<div class="skill-detail-price">'+sk.price+'</div>'
+    +'<div class="skill-req"><div class="skill-req-title">📋 Requisitos</div>'
+    +sk.reqs.map(function(r){return '<div class="skill-req-item"><span class="req-lock">'+( r.includes('🔒')?'🔒':'📌')+'</span>'+r+'</div>';}).join('')
+    +'</div>'
+    +'<div class="skill-levels"><div class="skill-req-title">⚡ Niveles</div>'
+    +sk.levels.map(function(l,i){
+      return '<div class="skill-level-item"><div class="lvl-badge '+(i===0?'gold':'')+'">'+['I','II','III'][i]+'</div><div class="lvl-info"><div class="lvl-name">'+l.split('·')[0].trim()+'</div><div class="lvl-desc">'+(l.split('·')[1]||'').trim()+'</div></div></div>';
+    }).join('')
+    +'</div></div>';
+  document.getElementById('skill-modal-content').innerHTML=html;
+  document.getElementById('skill-modal').classList.add('show');
+}
+
+// ── LECTURA ──
+function buildBooks(){
+  document.getElementById('books-list').innerHTML=STATE.books.map(function(b){
+    var pct=Math.round(b.current/b.total*100);
+    return '<div class="book-card">'
+      +'<div class="book-title">📖 '+escH(b.title)+'</div>'
+      +'<div class="book-author">'+escH(b.author)+'</div>'
+      +'<div class="book-prog"><span class="book-prog-label">Progreso</span><span class="book-prog-val">'+b.current+' / '+b.total+' '+b.unit+' · '+pct+'%</span></div>'
+      +'<div class="book-bar-wrap"><div class="book-bar-fill" style="width:'+pct+'%"></div></div>'
+      +'<div class="book-update-row">'
+      +'<input class="book-update-input" id="book-inp-'+b.id+'" type="number" inputmode="decimal" min="0" max="'+b.total+'" placeholder="Actualizar '+(b.unit==='páginas'?'página':'capítulo')+'...">'
+      +'<button class="book-update-btn" onclick="updateBook('+b.id+')">✓ Guardar</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function updateBook(id){
+  var inp=document.getElementById('book-inp-'+id);
+  var val=parseInt(inp.value)||0;if(!val)return;
+  var b=STATE.books.find(function(x){return x.id===id;});
+  if(b){
+    b.current=Math.min(b.total,val);inp.value='';
+    if(b.current>=b.total)showToast('🎉 ¡Libro completado! +100 XP');
+    else showToast('📖 Progreso actualizado');
+    buildBooks();dSave();
+  }
+}
+
+// ── NAV ──
+function switchPanel(name,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn:not(.locked)').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('panel-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function showLocked(title,desc,icon,cond){
+  document.getElementById('locked-title').textContent='🔒 '+title;
+  document.getElementById('locked-desc').textContent=desc;
+  document.getElementById('locked-icon').textContent=icon;
+  document.getElementById('locked-condition').textContent='⚡ '+cond;
+  switchPanel('locked',null);
+}
+function setBB(name){
+  document.querySelectorAll('.bb-item').forEach(function(b){b.classList.remove('active');});
+  var el=document.getElementById('bb-'+name);if(el)el.classList.add('active');
+}
+
+
+// ══════════════════════════════════════
+// MATERIALES DATA + FUNCTIONS  
+// ══════════════════════════════════════
+var MATS=[
+  {cat:'🔧 Instrumental',id:'m1',name:'Articulador Semiajustable',price:293},
+  {cat:'🔧 Instrumental',id:'m2',name:'Lámpara de Fotocurado',price:245},
+  {cat:'🔧 Instrumental',id:'m3',name:'Micromotor con pieza de mano',price:196},
+  {cat:'🔧 Instrumental',id:'m4',name:'Vibrador de Yeso ECO',price:130},
+  {cat:'🔧 Instrumental',id:'m5',name:'Turbina de alta velocidad',price:61},
+  {cat:'🔧 Instrumental',id:'m6',name:'Espejo bucal',price:null},
+  {cat:'🔧 Instrumental',id:'m7',name:'Explorador dental',price:null},
+  {cat:'🔧 Instrumental',id:'m8',name:'Pinza algodonera',price:null},
+  {cat:'🔧 Instrumental',id:'m9',name:'Sonda periodontal',price:null},
+  {cat:'🔧 Instrumental',id:'m10',name:'Fórceps (juego básico)',price:null},
+  {cat:'🔧 Instrumental',id:'m11',name:'Elevadores (juego básico)',price:null},
+  {cat:'🔧 Instrumental',id:'m12',name:'Atacadores de composite',price:null},
+  {cat:'🔧 Instrumental',id:'m13',name:'Espátulas de cemento',price:null},
+  {cat:'🔧 Instrumental',id:'m14',name:'Porta agujas + tijeras',price:null},
+  {cat:'🦷 Endodoncia',id:'e1',name:'Kit Grapas Fiesta9',price:107},
+  {cat:'🦷 Endodoncia',id:'e2',name:'Limas K-File x6 (surtido)',price:2.77},
+  {cat:'🦷 Endodoncia',id:'e3',name:'Gutapercha 2da serie',price:16},
+  {cat:'🦷 Endodoncia',id:'e4',name:'Cemento sellador endodóntico',price:null},
+  {cat:'🦷 Endodoncia',id:'e5',name:'Regla milimetrada endodóntica',price:null},
+  {cat:'🎨 Composite',id:'r1',name:'Kit Resinas Brilliant',price:17},
+  {cat:'🎨 Composite',id:'r2',name:'Silicona por adición',price:44},
+  {cat:'🎨 Composite',id:'r3',name:'Adhesivo dental 5ta gen',price:null},
+  {cat:'🎨 Composite',id:'r4',name:'Ácido grabador (gel fosfórico)',price:null},
+  {cat:'🎨 Composite',id:'r5',name:'Cemento de fosfato de zinc',price:null},
+  {cat:'🔬 Periodoncia',id:'p1',name:'Curetas Gracey (juego básico)',price:null},
+  {cat:'🔬 Periodoncia',id:'p2',name:'Hilo de sutura 3-0 y 4-0',price:null},
+  {cat:'🔬 Periodoncia',id:'p3',name:'Bisturí mango #3',price:null},
+  {cat:'🔬 Periodoncia',id:'p4',name:'Hojas de bisturí #15',price:0.28},
+  {cat:'📦 Insumos',id:'g1',name:'Gasas estériles x200',price:2.69},
+  {cat:'📦 Insumos',id:'g2',name:'Guantes de látex (caja)',price:null},
+  {cat:'📦 Insumos',id:'g3',name:'Mascarillas (caja)',price:null},
+  {cat:'📦 Insumos',id:'g4',name:'Agujas para carpule (caja)',price:null},
+  {cat:'📦 Insumos',id:'g5',name:'Anestesia (tubos carpule)',price:null},
+  {cat:'📦 Insumos',id:'g6',name:'Rollos de algodón',price:null},
+  {cat:'📦 Insumos',id:'g7',name:'Campo operatorio azul',price:null},
+];
+
+if(!STATE.materialesHave)STATE.materialesHave={};
+
+function buildMateriales(){
+  var cats={};
+  MATS.forEach(function(m){if(!cats[m.cat])cats[m.cat]=[];cats[m.cat].push(m);});
+  var tengo=0,faltan=0,costo=0;
+  MATS.forEach(function(m){
+    if(STATE.materialesHave[m.id])tengo++;
+    else{faltan++;if(m.price)costo+=m.price;}
+  });
+  var tEl=document.getElementById('mat-tengo');
+  var fEl=document.getElementById('mat-faltan');
+  var cEl=document.getElementById('mat-costo');
+  if(tEl)tEl.textContent=tengo;
+  if(fEl)fEl.textContent=faltan;
+  if(cEl)cEl.textContent='$'+costo.toFixed(0);
+  var html='';
+  Object.keys(cats).forEach(function(cat){
+    var items=cats[cat];
+    var hc=items.filter(function(m){return STATE.materialesHave[m.id];}).length;
+    var cid='catb_'+cat.replace(/[^\w]/g,'_');
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;margin-bottom:5px;cursor:pointer" onclick="togCat(\''+cid+'\')">'
+      +'<div style="font-size:13px;font-weight:800">'+cat+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)">'+hc+'/'+items.length+' <span id="arr_'+cid+'">▼</span></div></div>'
+      +'<div style="display:none;margin-bottom:8px" id="'+cid+'">'
+      +items.map(function(m){
+        var h=STATE.materialesHave[m.id];
+        return '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);border-radius:var(--rx);margin-bottom:4px;border:1px solid var(--border)">'
+          +'<div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;'+(h?'background:var(--accent3);border-color:var(--accent3);color:#000':'')+'" onclick="togMat(\''+m.id+'\')">'+( h?'✓':'')+'</div>'
+          +'<div style="flex:1;font-size:12px">'+H(m.name)+'</div>'
+          +(m.price?'<div style="font-size:11px;font-weight:700;color:var(--gold);white-space:nowrap">$'+m.price+'</div>':'<div style="font-size:10px;color:var(--muted2)">s/p</div>')
+          +'</div>';
+      }).join('')+'</div>';
+  });
+  var el=document.getElementById('materiales-list');
+  if(el)el.innerHTML=html;
+}
+
+function togCat(id){
+  var el=document.getElementById(id);if(!el)return;
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  var a=document.getElementById('arr_'+id);if(a)a.textContent=open?'▼':'▲';
+}
+function togMat(id){
+  if(STATE.materialesHave[id])delete STATE.materialesHave[id];
+  else STATE.materialesHave[id]=true;
+  buildMateriales();dSave();
+}
+
+// ── INIT ──
+buildMisiones();buildFinanzas();buildEjercicio();buildSkills();buildBooks();
+updatePomoDisplay();updateXP();
+</script>
+</body>
+</html>
